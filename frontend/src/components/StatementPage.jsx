@@ -3,6 +3,7 @@ import { ChevronLeft } from 'lucide-react';
 import StatementUploader from './StatementUploader';
 import TransactionPreview from './TransactionPreview';
 import ImportSummary from './ImportSummary';
+import API_URL from '../config';
 
 export default function StatementPage({ onBack, onViewExpenses }) {
     const [step, setStep] = useState('upload'); // 'upload' | 'preview' | 'success'
@@ -34,7 +35,7 @@ export default function StatementPage({ onBack, onViewExpenses }) {
                 }))
             };
 
-            const response = await fetch('http://localhost:5000/api/expenses/bulk-import', {
+            const response = await fetch(`${API_URL}/api/expenses/bulk-import`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

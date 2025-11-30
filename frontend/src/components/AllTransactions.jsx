@@ -54,12 +54,32 @@ const formatDate = (isoDateString) => {
     }
 };
 
-export default function AllTransactions({ transactions, onBack }) {
+export default function AllTransactions({ onBack }) {
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [selectedMonth, setSelectedMonth] = useState('All');
     const [merchantSearch, setMerchantSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [selectedType, setSelectedType] = useState('All');
+    const [selectedType, setSelectedType] = useState('All'); // 'All' | 'DEBIT' | 'CREDIT'
     const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
+
+    useEffect(() => {
+        const fetchTransactions = async () => {
+            try {
+                const response = await fetch(`${API_URL}/api/expenses`);
+                const data = await response.json();
+                if (data.success) {
+                    setTransactions(data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching transactions:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTransactions();
+    }, []);
 
     // Filter and Sort Transactions
     const processedTransactions = useMemo(() => {

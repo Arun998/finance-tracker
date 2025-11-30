@@ -28,25 +28,35 @@ const formatDate = (isoDateString) => {
 };
 
 export default function TransactionPreview({ transactions, fileInfo, onImport, onCancel, isImporting }) {
+    const [editedTransactions, setEditedTransactions] = useState(transactions);
     const [editingId, setEditingId] = useState(null);
-    const [editData, setEditData] = useState({});
+    const [editForm, setEditForm] = useState({});
     const [selectedRows, setSelectedRows] = useState(new Set());
 
-    const startEdit = (transaction) => {
-        setEditingId(transaction._id || `temp-${Math.random()}`);
-        setEditData(transaction);
+    useEffect(() => {
+        setEditedTransactions(transactions);
+    }, [transactions]);
+
+    // Calculate totals
+    const totalAmount = editedTransactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+    const validCount = editedTransactions.filter(tx => tx.date && tx.amount).length;
+    const categorizerAccuracy = editedTransactions.filter(tx => tx.categoryInfo?.confidence >= 80).length / editedTransactions.length * 100;
+
+    const handleEdit = (tx, index) => {
+        setEditingId(index);
+        setEditForm({ ...tx });
     };
 
     const saveEdit = () => {
-        const updatedTransactions = transactions.map(t => 
-            (t._id || `temp-${Math.random()}`) === editingId ? editData : t
+        setEditedTransactions(prev => 
+            prev.map((tx, idx) => (idx === editingId ? editForm : tx))
         );
         setEditingId(null);
     };
 
     const cancelEdit = () => {
         setEditingId(null);
-        setEditData({});
+        setEditForm({});
     };
 
     const toggleRow = (id) => {
@@ -66,8 +76,7 @@ export default function TransactionPreview({ transactions, fileInfo, onImport, o
         }
     };
 
-    const totalAmount = transactions.reduce((sum, tx) => sum + tx.amount, 0);
-    const categorizerAccuracy = transactions.filter(tx => tx.categoryInfo?.confidence >= 80).length / transactions.length * 100;
+
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -168,8 +177,8 @@ export default function TransactionPreview({ transactions, fileInfo, onImport, o
                                             {isEditing ? (
                                                 <input
                                                     type="date"
-                                                    value={editData.date || ''}
-                                                    onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                                                    value={editForm.date || ''}
+                                                    onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
                                                     className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded text-white text-sm"
                                                 />
                                             ) : (
@@ -183,8 +192,8 @@ export default function TransactionPreview({ transactions, fileInfo, onImport, o
                                             {isEditing ? (
                                                 <input
                                                     type="text"
-                                                    value={editData.merchant}
-                                                    onChange={(e) => setEditData({ ...editData, merchant: e.target.value })}
+                                                    value={editForm.merchant}
+                                                    onChange={(e) => setEditForm({ ...editForm, merchant: e.target.value })}
                                                     className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded text-white text-sm"
                                                 />
                                             ) : (
@@ -198,8 +207,8 @@ export default function TransactionPreview({ transactions, fileInfo, onImport, o
                                             {isEditing ? (
                                                 <input
                                                     type="number"
-                                                    value={editData.amount || ''}
-                                                    onChange={(e) => setEditData({ ...editData, amount: parseFloat(e.target.value) })}
+                                                    value={editForm.amount || ''}
+                                                    onChange={(e) => setEditForm({ ...editForm, amount: parseFloat(e.target.value) })}
                                                     className="w-28 px-3 py-2 bg-slate-700 border border-purple-500/50 rounded text-white text-right text-sm"
                                                 />
                                             ) : (
@@ -211,8 +220,8 @@ export default function TransactionPreview({ transactions, fileInfo, onImport, o
                                         <td className="px-6 py-4 text-sm">
                                             {isEditing ? (
                                                 <select
-                                                    value={editData.type || transaction.type || 'DEBIT'}
-                                                    onChange={(e) => setEditData({ ...editData, type: e.target.value })}
+                                                    value={editForm.type || transaction.type || 'DEBIT'}
+                                                    onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
                                                     className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded text-white text-sm"
                                                 >
                                                     <option value="DEBIT">DEBIT</option>
@@ -231,8 +240,8 @@ export default function TransactionPreview({ transactions, fileInfo, onImport, o
                                         <td className="px-6 py-4 text-sm">
                                             {isEditing ? (
                                                 <select
-                                                    value={editData.category || transaction.category}
-                                                    onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                                                    value={editForm.category || transaction.category}
+                                                    onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                                                     className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded text-white text-sm"
                                                 >
                                                     {CATEGORIES.map(cat => (

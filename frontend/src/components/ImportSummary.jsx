@@ -14,6 +14,15 @@ const getCategoryEmoji = (category) => {
 };
 
 export default function ImportSummary({ result, onNewImport, onViewExpenses }) {
+    const { summary, transactions } = result;
+    
+    // Calculate stats
+    const totalAmount = transactions.reduce((sum, tx) => sum + tx.amount, 0);
+    const categories = [...new Set(transactions.map(tx => tx.category))];
+    const dateRange = {
+        start: new Date(Math.min(...transactions.map(tx => new Date(tx.date)))),
+        end: new Date(Math.max(...transactions.map(tx => new Date(tx.date))))
+    };
     const { data } = result;
     const totalValue = data.summary?.totalAmount || 0;
     const categoryBreakdown = data.summary?.byCategory || {};

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import API_URL from '../config';
 
 const ExpenseForm = ({ onExpenseAdded }) => {
   const [formData, setFormData] = useState({

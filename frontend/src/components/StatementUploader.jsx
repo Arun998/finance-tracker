@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload, AlertCircle, CheckCircle, Loader } from 'lucide-react';
+import API_URL from '../config';
 
 export default function StatementUploader({ onUploadSuccess, onError }) {
     const [isDragging, setIsDragging] = useState(false);

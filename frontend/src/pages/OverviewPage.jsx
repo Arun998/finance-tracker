@@ -5,6 +5,7 @@ import WeeklyChart from '../components/WeeklyChart';
 import MonthlyChart from '../components/MonthlyChart';
 import ExpenseForm from '../components/ExpenseForm';
 import ExpenseList from '../components/ExpenseList';
+import API_URL from '../config';
 
 export default function OverviewPage({ expenses, onExpenseAdded, dailySummary, weeklySummary, monthlySummary }) {
   return (

@@ -7,6 +7,7 @@ import WeeklyPage from './pages/WeeklyPage';
 import MonthlyPage from './pages/MonthlyPage';
 import AllTransactionsPage from './pages/AllTransactionsPage';
 import ImportPage from './pages/ImportPage';
+import API_URL from './config';
 
 function App() {
   const [expenses, setExpenses] = useState([]);
@@ -17,22 +18,22 @@ function App() {
   const fetchData = async () => {
     try {
       // Fetch all expenses
-      const expensesRes = await fetch('http://localhost:5000/api/expenses');
+      const expensesRes = await fetch(`${API_URL}/api/expenses`);
       const expensesData = await expensesRes.json();
       setExpenses(expensesData.data || []);
 
       // Fetch daily summary
-      const dailyRes = await fetch('http://localhost:5000/api/expenses/summary/daily');
+      const dailyRes = await fetch(`${API_URL}/api/expenses/summary/daily`);
       const dailyData = await dailyRes.json();
       setDailySummary(dailyData.data);
 
       // Fetch weekly summary
-      const weeklyRes = await fetch('http://localhost:5000/api/expenses/summary/weekly');
+      const weeklyRes = await fetch(`${API_URL}/api/expenses/summary/weekly`);
       const weeklyData = await weeklyRes.json();
       setWeeklySummary(weeklyData.data);
 
       // Fetch monthly summary
-      const monthlyRes = await fetch('http://localhost:5000/api/expenses/summary/monthly');
+      const monthlyRes = await fetch(`${API_URL}/api/expenses/summary/monthly`);
       const monthlyData = await monthlyRes.json();
       setMonthlySummary(monthlyData.data);
     } catch (error) {
