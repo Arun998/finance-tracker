@@ -53,7 +53,7 @@ export default function StatementUploader({ onUploadSuccess, onError }) {
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:5000/api/expenses/parse-statement', {
+            const response = await fetch(`${API_URL}/api/expenses/parse-statement`, {
                 method: 'POST',
                 body: formData
             });

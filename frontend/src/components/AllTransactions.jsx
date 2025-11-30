@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo,useEffect } from 'react';
 import { ChevronLeft, TrendingDown, Calendar, Tag, Filter, Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 const CATEGORIES = ['Food', 'Transport', 'Entertainment', 'Shopping', 'Bills', 'Health', 'Other'];
