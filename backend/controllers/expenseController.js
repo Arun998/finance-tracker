@@ -3,11 +3,12 @@ import Expense from '../models/Expense.js';
 // Add new expense
 export const addExpense = async (req, res) => {
     try {
-        const { amount, category, date, notes } = req.body;
+        const { amount, category, date, notes, type } = req.body;
 
         const expense = new Expense({
             amount,
             category,
+            type: type || 'DEBIT',
             date: date || new Date(),
             notes
         });
@@ -60,7 +61,18 @@ export const getDailySummary = async (req, res) => {
             date: { $gte: today, $lt: tomorrow }
         });
 
-        const total = dailyExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+        let totalCredit = 0;
+        let totalDebit = 0;
+
+        dailyExpenses.forEach(exp => {
+            if (exp.type === 'CREDIT') {
+                totalCredit += exp.amount;
+            } else {
+                totalDebit += exp.amount;
+            }
+        });
+
+        const total = totalDebit - totalCredit; // Net expense
 
         const byCategory = dailyExpenses.reduce((acc, exp) => {
             acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
@@ -71,6 +83,8 @@ export const getDailySummary = async (req, res) => {
             success: true,
             data: {
                 total,
+                totalCredit,
+                totalDebit,
                 count: dailyExpenses.length,
                 byCategory,
                 expenses: dailyExpenses
@@ -100,7 +114,18 @@ export const getWeeklySummary = async (req, res) => {
             date: { $gte: weekAgo, $lt: tomorrow }
         }).sort({ date: 1 });
 
-        const total = weeklyExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+        let totalCredit = 0;
+        let totalDebit = 0;
+
+        weeklyExpenses.forEach(exp => {
+            if (exp.type === 'CREDIT') {
+                totalCredit += exp.amount;
+            } else {
+                totalDebit += exp.amount;
+            }
+        });
+
+        const total = totalDebit - totalCredit; // Net expense
 
         // Group by day
         const byDay = {};
@@ -123,6 +148,8 @@ export const getWeeklySummary = async (req, res) => {
             success: true,
             data: {
                 total,
+                totalCredit,
+                totalDebit,
                 count: weeklyExpenses.length,
                 byDay,
                 byCategory,
@@ -148,7 +175,18 @@ export const getMonthlySummary = async (req, res) => {
             date: { $gte: firstDayOfMonth, $lt: firstDayOfNextMonth }
         }).sort({ date: 1 });
 
-        const total = monthlyExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+        let totalCredit = 0;
+        let totalDebit = 0;
+
+        monthlyExpenses.forEach(exp => {
+            if (exp.type === 'CREDIT') {
+                totalCredit += exp.amount;
+            } else {
+                totalDebit += exp.amount;
+            }
+        });
+
+        const total = totalDebit - totalCredit; // Net expense
 
         // Group by category
         const byCategory = monthlyExpenses.reduce((acc, exp) => {
@@ -171,6 +209,8 @@ export const getMonthlySummary = async (req, res) => {
             success: true,
             data: {
                 total,
+                totalCredit,
+                totalDebit,
                 count: monthlyExpenses.length,
                 byCategory,
                 byWeek,

@@ -65,9 +65,16 @@ const ExpenseList = ({ expenses }) => {
               </div>
               
               <div className="text-right">
-                <p className="text-2xl font-bold text-gradient">
-                  ₹{expense.amount.toFixed(2)}
+                <p className={`text-2xl font-bold ${expense.type === 'CREDIT' ? 'text-green-400' : 'text-gradient'}`}>
+                  {expense.type === 'CREDIT' ? '+' : ''}₹{expense.amount.toFixed(2)}
                 </p>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                  expense.type === 'CREDIT' 
+                    ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
+                    : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                }`}>
+                  {expense.type || 'DEBIT'}
+                </span>
               </div>
             </div>
           </div>

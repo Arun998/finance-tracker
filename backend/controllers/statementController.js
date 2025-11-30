@@ -186,6 +186,7 @@ export const bulkImportTransactions = async (req, res) => {
             amount: tx.amount,
             category: tx.categoryInfo?.category || 'Other',
             date: new Date(tx.date),
+            type: tx.type || 'DEBIT',
             notes: tx.merchant,
             sourceType: 'statement',
             transactionId: tx.transactionId || null,

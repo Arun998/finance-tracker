@@ -58,6 +58,7 @@ export default function AllTransactions({ transactions, onBack }) {
     const [selectedMonth, setSelectedMonth] = useState('All');
     const [merchantSearch, setMerchantSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedType, setSelectedType] = useState('All');
     const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
 
     // Filter and Sort Transactions
@@ -87,7 +88,12 @@ export default function AllTransactions({ transactions, onBack }) {
             result = result.filter(tx => tx.category === selectedCategory);
         }
 
-        // 4. Sort
+        // 4. Filter by Type
+        if (selectedType !== 'All') {
+            result = result.filter(tx => (tx.type || 'DEBIT') === selectedType);
+        }
+
+        // 5. Sort
         result.sort((a, b) => {
             let aValue = a[sortConfig.key];
             let bValue = b[sortConfig.key];
@@ -104,9 +110,15 @@ export default function AllTransactions({ transactions, onBack }) {
         });
 
         return result;
-    }, [transactions, selectedMonth, merchantSearch, selectedCategory, sortConfig]);
+    }, [transactions, selectedMonth, merchantSearch, selectedCategory, selectedType, sortConfig]);
     
-    const totalAmount = processedTransactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+    const totalCredit = processedTransactions
+        .filter(tx => tx.type === 'CREDIT')
+        .reduce((sum, tx) => sum + (tx.amount || 0), 0);
+
+    const totalDebit = processedTransactions
+        .filter(tx => (tx.type || 'DEBIT') === 'DEBIT')
+        .reduce((sum, tx) => sum + (tx.amount || 0), 0);
     
     // Group transactions by category (for stats)
     const byCategory = {};
@@ -140,10 +152,12 @@ export default function AllTransactions({ transactions, onBack }) {
                             <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                                 <ChevronLeft className="w-6 h-6 text-white" />
                             </button>
-                            <h1 className="text-4xl font-bold text-gradient">All Transactions</h1>
+                            <h1 className="text-4xl font-bold text-gradient">
+                                {selectedMonth === 'All' ? 'All Transactions' : `Transactions for ${selectedMonth}`}
+                            </h1>
                         </div>
                         <p className="text-gray-300 ml-11">
-                            {processedTransactions.length} transactions • Total: <span className="text-gradient font-semibold">₹{totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                            {processedTransactions.length} transactions
                         </p>
                     </div>
                     
@@ -174,13 +188,13 @@ export default function AllTransactions({ transactions, onBack }) {
                     <p className="text-3xl font-bold text-gradient">{processedTransactions.length}</p>
                 </div>
                 <div className="glass rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/50 transition-all">
-                    <p className="text-gray-400 text-sm mb-2">Total Amount</p>
-                    <p className="text-3xl font-bold text-green-400">₹{totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                    <p className="text-gray-400 text-sm mb-2">Total Credit</p>
+                    <p className="text-3xl font-bold text-green-400">₹{totalCredit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
                 </div>
                 <div className="glass rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/50 transition-all">
-                    <p className="text-gray-400 text-sm mb-2">Average</p>
-                    <p className="text-3xl font-bold text-pink-400">
-                        ₹{processedTransactions.length > 0 ? (totalAmount / processedTransactions.length).toLocaleString('en-IN', { maximumFractionDigits: 0 }) : '0'}
+                    <p className="text-gray-400 text-sm mb-2">Total Debit</p>
+                    <p className="text-3xl font-bold text-red-400">
+                        ₹{totalDebit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                     </p>
                 </div>
                 <div className="glass rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/50 transition-all">
@@ -201,18 +215,32 @@ export default function AllTransactions({ transactions, onBack }) {
                         className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                     />
                 </div>
-                <div className="relative min-w-[200px]">
-                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/20 rounded-xl text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
-                    >
-                        <option value="All">All Categories</option>
-                        {CATEGORIES.map(cat => (
-                            <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                    </select>
+                <div className="flex gap-4">
+                    <div className="relative min-w-[140px]">
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <select
+                            value={selectedType}
+                            onChange={(e) => setSelectedType(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/20 rounded-xl text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                        >
+                            <option value="All">All Types</option>
+                            <option value="DEBIT">Debit</option>
+                            <option value="CREDIT">Credit</option>
+                        </select>
+                    </div>
+                    <div className="relative min-w-[200px]">
+                        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/20 rounded-xl text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                        >
+                            <option value="All">All Categories</option>
+                            {CATEGORIES.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -308,7 +336,8 @@ export default function AllTransactions({ transactions, onBack }) {
                     <div className="space-y-5">
                         {Object.entries(byCategory).map(([category, items]) => {
                             const categoryTotal = items.reduce((sum, tx) => sum + tx.amount, 0);
-                            const percentage = (categoryTotal / totalAmount) * 100;
+                            const totalForPercentage = totalDebit + totalCredit; // Use total volume for percentage
+                            const percentage = totalForPercentage > 0 ? (categoryTotal / totalForPercentage) * 100 : 0;
                             return (
                                 <div key={category} className="group">
                                     <div className="flex items-center justify-between mb-2">

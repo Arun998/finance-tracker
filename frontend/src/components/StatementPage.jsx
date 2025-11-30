@@ -26,7 +26,7 @@ export default function StatementPage({ onBack, onViewExpenses }) {
                 transactions: transactions.map(tx => ({
                     date: tx.date,
                     amount: tx.amount,
-                    type: 'DEBIT', // Default to debit for bank statements
+                    type: tx.type || 'DEBIT',
                     merchant: tx.merchant,
                     description: tx.description || tx.rawDescription,
                     categoryInfo: tx.categoryInfo || { category: tx.category, confidence: 0 },

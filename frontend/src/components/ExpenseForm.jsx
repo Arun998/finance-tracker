@@ -3,6 +3,7 @@ import { useState } from 'react';
 const ExpenseForm = ({ onExpenseAdded }) => {
   const [formData, setFormData] = useState({
     amount: '',
+    type: 'DEBIT',
     category: 'Food',
     date: new Date().toISOString().split('T')[0],
     notes: ''
@@ -36,6 +37,7 @@ const ExpenseForm = ({ onExpenseAdded }) => {
       if (response.ok) {
         setFormData({
           amount: '',
+          type: 'DEBIT',
           category: 'Food',
           date: new Date().toISOString().split('T')[0],
           notes: ''
@@ -54,19 +56,48 @@ const ExpenseForm = ({ onExpenseAdded }) => {
       <h2 className="text-2xl font-bold mb-6 text-gradient">Add New Expense</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-200">Amount</label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">₹</span>
-            <input
-              type="number"
-              step="0.01"
-              required
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              className="w-full pl-10 pr-4 py-3 glass-dark rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none text-white placeholder-gray-400"
-              placeholder="0.00"
-            />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-200">Type</label>
+            <div className="flex bg-slate-800/50 p-1 rounded-xl border border-purple-500/20">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, type: 'DEBIT' })}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+                  formData.type === 'DEBIT'
+                    ? 'bg-red-500/20 text-red-400 shadow-lg border border-red-500/30'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Debit
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, type: 'CREDIT' })}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+                  formData.type === 'CREDIT'
+                    ? 'bg-green-500/20 text-green-400 shadow-lg border border-green-500/30'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Credit
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-200">Amount</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">₹</span>
+              <input
+                type="number"
+                step="0.01"
+                required
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                className="w-full pl-10 pr-4 py-3 glass-dark rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none text-white placeholder-gray-400"
+                placeholder="0.00"
+              />
+            </div>
           </div>
         </div>
 

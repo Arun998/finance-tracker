@@ -12,6 +12,12 @@ const expenseSchema = new mongoose.Schema({
     enum: ['Food', 'Transport', 'Entertainment', 'Shopping', 'Bills', 'Health', 'Other'],
     default: 'Other'
   },
+  type: {
+    type: String,
+    enum: ['DEBIT', 'CREDIT'],
+    default: 'DEBIT',
+    required: true
+  },
   date: {
     type: Date,
     required: [true, 'Date is required'],
@@ -56,10 +62,7 @@ const expenseSchema = new mongoose.Schema({
 
 // Index for efficient date-based queries
 expenseSchema.index({ date: -1 });
-expenseSchema.index({ category: 1, date: -1 });
-expenseSchema.index({ uploadBatchId: 1 });
 expenseSchema.index({ sourceType: 1, importedAt: -1 });
-expenseSchema.index({ category: 1, date: -1 });
 
 const Expense = mongoose.model('Expense', expenseSchema);
 
