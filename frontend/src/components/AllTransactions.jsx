@@ -1,5 +1,6 @@
 import { useState, useMemo,useEffect } from 'react';
 import { ChevronLeft, TrendingDown, Calendar, Tag, Filter, Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import API_URL from '../config';
 
 const CATEGORIES = ['Food', 'Transport', 'Entertainment', 'Shopping', 'Bills', 'Health', 'Other'];
 const MONTHS = ['All', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
